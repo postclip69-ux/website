@@ -199,10 +199,9 @@
                 <li><a href="#">PROFIL</a></li>
                 <li id="produk-menu-item"><a href="#">PRODUK ▼</a>
                     <ul class="submenu" id="produk-submenu">
-                        <li><a href="#">PRODUK AKRAB V1</a></li>
+                        <li><a href="produk-akrab-v1.html">PRODUK AKRAB V1</a></li>
                         <li><a href="produk-akrab-v2.html">PRODUK AKRAB V2</a></li>
-
-                        <li><a href="#">PRODUK AKRAB V3</a></li>
+                        <li><a href="produk-akrab-v3.html">PRODUK AKRAB V3</a></li>
                     </ul>
                 </li>
                 <li><a href="#">TOPUP</a></li>
@@ -240,11 +239,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- KONFIGURASI SUPABASE ---
-        // Ganti dengan URL dan Kunci Anon dari proyek Supabase Anda
         const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
         
-        // Inisialisasi klien Supabase dengan nama variabel yang benar
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- ELEMEN DOM ---
@@ -263,14 +260,11 @@
         });
 
         async function checkLoginStatus() {
-            // Ambil data dari localStorage
             const loggedInUserId = localStorage.getItem('loggedInUserId');
             if (!loggedInUserId) {
-                // Jika tidak ada, tendang kembali ke halaman login
                 alert('Anda harus login terlebih dahulu.');
                 window.location.href = 'index.html';
             } else {
-                // Jika ada, ambil data user tersebut
                 fetchUserData(loggedInUserId);
             }
         }
@@ -299,10 +293,7 @@
         }
         
         function displayUserData(user) {
-            // Tampilkan saldo dengan format Rupiah
             saldoDisplay.textContent = `Rp ${user.saldo.toLocaleString('id-ID')}`;
-
-            // Jika rolenya 'admin', tampilkan menu admin
             if (user.role === 'admin') {
                 adminMenu.style.display = 'block';
             }
@@ -320,9 +311,14 @@
             overlay.classList.remove('show');
         });
 
+        // PERBAIKAN: Logika agar link submenu bisa diklik
         produkMenuItem.addEventListener('click', (event) => {
-            event.preventDefault(); 
-            produkSubmenu.classList.toggle('open');
+            // Hanya jalankan preventDefault jika yang diklik adalah link utamanya ("PRODUK ▼"),
+            // bukan link di dalam submenu (seperti "PRODUK AKRAB V2").
+            if (event.target.parentElement.id === 'produk-menu-item') {
+                event.preventDefault(); 
+                produkSubmenu.classList.toggle('open');
+            }
         });
 
         logoutButton.addEventListener('click', () => {
@@ -330,10 +326,10 @@
         });
 
         function logout() {
-            // Hapus data dari localStorage saat logout
             localStorage.removeItem('loggedInUserId');
             window.location.href = 'index.html';
         }
     </script>
 </body>
-</html>
+                    </html>
+    
