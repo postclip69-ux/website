@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Agen</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #1a202c;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        p {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2b6cb0;
+        }
+        
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        #error-message {
+            margin-top: 20px;
+            color: #e53e3e;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>FORM LOGIN</h1>
+        <p>Silakan masukkan ID Agen dan katasandi Anda.</p>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <label for="id-agen">ID Agen</label>
+                <input type="text" id="id-agen" name="id-agen" required>
+            </div>
+            <div class="input-group">
+                <label for="katasandi">Katasandi</label>
+                <input type="password" id="katasandi" name="katasandi" required>
+            </div>
+            <button type="submit" id="login-button">Login</button>
+        </form>
+        
+        <p id="error-message" style="display: none;"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- ELEMEN FORM ---
+        const loginForm = document.getElementById('login-form');
+        const loginButton = document.getElementById('login-button');
+        const errorMessage = document.getElementById('error-message');
+        
+        // --- LOGIKA LOGIN ---
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Mencegah form reload halaman
+            
+            // Ambil nilai dari input
+            const idAgen = document.getElementById('id-agen').value;
+            const katasandi = document.getElementById('katasandi').value;
+            
+            // Tampilkan status loading di tombol
+            loginButton.disabled = true;
+            loginButton.textContent = 'Mengecek...';
+            errorMessage.style.display = 'none';
+
+            try {
+                // Cari data di Supabase yang cocok dengan id_agen DAN katasandi
+                const { data, error } = await supabase
+                    .from('agen') // Nama tabel Anda
+                    .select('id_agen')
+                    .eq('id_agen', idAgen)
+                    .eq('katasandi', katasandi)
+                    .maybeSingle(); // Hanya ambil satu baris, atau null jika tidak ada
+
+                if (error) {
+                    throw error; // Lemparkan error jika ada masalah koneksi
+                }
+
+                if (data) {
+                    // JIKA DATA DITEMUKAN (LOGIN BERHASIL)
+                    alert('Login Berhasil!');
+                    window.location.href = 'dashboard.html'; // Lanjutkan ke halaman dashboard
+                } else {
+                    // JIKA DATA TIDAK DITEMUKAN
+                    errorMessage.textContent = 'DATA TIDAK DITEMUKAN, SILAHKAN HUBUNGI ADMIN UNTUK INFO LEBIH LANJUT.';
+                    errorMessage.style.display = 'block';
+                }
+
+            } catch (error) {
+                errorMessage.textContent = `Terjadi error: ${error.message}`;
+                errorMessage.style.display = 'block';
+            } finally {
+                // Kembalikan tombol ke kondisi normal
+                loginButton.disabled = false;
+                loginButton.textContent = 'Login';
+            }
+        });
+    </script>
+</body>
+</html>
