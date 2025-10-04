@@ -122,6 +122,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- KONFIGURASI SUPABASE ---
+        // PASTIkan Anda mengisi URL dan Kunci ANon Anda di sini
         const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
         
@@ -137,34 +138,30 @@
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // Mencegah form reload halaman
             
-            // Ambil nilai dari input
             const idAgen = document.getElementById('id-agen').value;
             const katasandi = document.getElementById('katasandi').value;
             
-            // Tampilkan status loading di tombol
             loginButton.disabled = true;
             loginButton.textContent = 'Mengecek...';
             errorMessage.style.display = 'none';
 
             try {
-                // PERBAIKAN: Menggunakan 'supabaseClient' untuk melakukan query ke database
+                // PERBAIKAN: Menggunakan 'supabaseClient' untuk melakukan query
                 const { data, error } = await supabaseClient
                     .from('agen') // Nama tabel Anda
                     .select('id_agen')
                     .eq('id_agen', idAgen)
                     .eq('katasandi', katasandi)
-                    .maybeSingle(); // Hanya ambil satu baris, atau null jika tidak ada
+                    .maybeSingle();
 
                 if (error) {
-                    throw error; // Lemparkan error jika ada masalah koneksi
+                    throw error;
                 }
 
                 if (data) {
-                    // JIKA DATA DITEMUKAN (LOGIN BERHASIL)
                     alert('Login Berhasil!');
-                    window.location.href = 'dashboard.html'; // Lanjutkan ke halaman dashboard
+                    window.location.href = 'dashboard.html';
                 } else {
-                    // JIKA DATA TIDAK DITEMUKAN
                     errorMessage.textContent = 'DATA TIDAK DITEMUKAN, SILAHKAN HUBUNGI ADMIN UNTUK INFO LEBIH LANJUT.';
                     errorMessage.style.display = 'block';
                 }
@@ -173,12 +170,25 @@
                 errorMessage.textContent = `Terjadi error: ${error.message}`;
                 errorMessage.style.display = 'block';
             } finally {
-                // Kembalikan tombol ke kondisi normal
                 loginButton.disabled = false;
                 loginButton.textContent = 'Login';
             }
         });
     </script>
+    ```
+
+#### **Langkah 3: Tempel di Tempat yang Benar**
+Tempelkan blok kode yang baru saja Anda salin tepat **sebelum** tag penutup `</body>`.
+
+#### **Langkah 4: Simpan dan Lakukan "Hard Refresh"**
+1.  **Simpan** file `login.html` Anda.
+2.  Buka kembali halaman login di browser Anda.
+3.  Lakukan **Hard Refresh** untuk memastikan browser tidak menggunakan file lama yang tersimpan di cache. Caranya:
+    * **Windows/Linux**: Tekan `Ctrl + Shift + R`
+    * **Mac**: Tekan `Cmd + Shift + R`
+
+Dengan mengikuti empat langkah ini, kode yang salah dijamin akan terganti sepenuhnya dan error tersebut akan hilang.
+
 
 </body>
 </html>
