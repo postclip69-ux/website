@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Paket Sidompul</title>
+    <style>
+        :root {
+            --primary-color: #3182ce;
+            --background-color: #f4f7f9;
+            --sidebar-bg: #1a202c;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            height: var(--header-height);
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        #menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .user-info span {
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+
+        /* --- Sidebar / Menu --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100%;
+            background-color: var(--sidebar-bg);
+            color: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1002;
+            padding-top: var(--header-height);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-nav li a {
+            display: block;
+            padding: 15px 20px;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-nav li a:hover {
+            background-color: #2d3748;
+        }
+        
+        /* Submenu Styling */
+        .submenu {
+            list-style: none;
+            padding-left: 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .submenu.open {
+            max-height: 200px; /* Adjust as needed */
+        }
+        
+        .submenu li a {
+            padding-left: 30px;
+            font-size: 14px;
+        }
+
+        #admin-menu {
+            display: none; /* Disembunyikan secara default */
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #4a5568;
+        }
+        
+        #admin-menu h4 {
+            padding: 0 20px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        /* Overlay for when sidebar is open */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+
+        /* --- Main Content & Footer --- */
+        .main-content {
+            margin-top: var(--header-height);
+            padding: 20px;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 15px;
+            background-color: #e2e8f0;
+            font-size: 14px;
+            color: #4a5568;
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+</head>
+<body>
+
+    <header class="header">
+        <button id="menu-btn">☰</button>
+        <div class="user-info">
+            Saldo: <span id="saldo-display">Memuat...</span>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu Utama</h3>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#">DASHBOARD</a></li>
+            <li><a href="#">PROFIL</a></li>
+            <li id="produk-menu-item"><a href="#">PRODUK ▼</a>
+                <ul class="submenu" id="produk-submenu">
+                    <li><a href="#">PRODUK AKRAB V1</a></li>
+                    <li><a href="#">PRODUK AKRAB V2</a></li>
+                    <li><a href="#">PRODUK AKRAB V3</a></li>
+                </ul>
+            </li>
+            <li><a href="#">TOPUP</a></li>
+            <li><a href="#">HISTORY</a></li>
+            <li><a href="#">KONTAK</a></li>
+        </ul>
+        
+        <div id="admin-menu">
+            <h4>Menu Admin</h4>
+            <ul class="sidebar-nav">
+                <li><a href="#">DAFTARKAN AGEN</a></li>
+                <li><a href="#">TAMBAH/KURANGI SALDO</a></li>
+                <li><a href="#">BANNED PENGGUNA</a></li>
+                <li><a href="#">KIRIM PESAN KHUSUS</a></li>
+                <li><a href="#">PERMINTAAN TRANSAKSI</a></li>
+                <li><a href="#">RIWAYAT TRANSAKSI</a></li>
+                <li><a href="#">TAMBAH PRODUK</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1>Selamat Datang di Dashboard Anda</h1>
+        <p>Silakan gunakan menu di samping kiri untuk navigasi.</p>
+    </main>
+
+    <footer class="footer">
+        © PAKET SIDOMPUL 2025
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- ELEMEN DOM ---
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const saldoDisplay = document.getElementById('saldo-display');
+        const adminMenu = document.getElementById('admin-menu');
+        const produkMenuItem = document.getElementById('produk-menu-item');
+        const produkSubmenu = document.getElementById('produk-submenu');
+
+        // --- FUNGSI UTAMA SAAT HALAMAN DIBUKA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+        });
+
+        // 1. Cek apakah ada user yang login
+        async function checkLoginStatus() {
+            const loggedInUserId = sessionStorage.getItem('loggedInUserId');
+            if (!loggedInUserId) {
+                // Jika tidak ada, tendang kembali ke halaman login
+                alert('Anda harus login terlebih dahulu.');
+                window.location.href = 'index.html';
+            } else {
+                // Jika ada, ambil data user tersebut
+                fetchUserData(loggedInUserId);
+            }
+        }
+
+        // 2. Ambil data user dari Supabase
+        async function fetchUserData(userId) {
+            try {
+                const { data, error } = await supabase
+                    .from('agen')
+                    .select('id_agen, saldo, role')
+                    .eq('id_agen', userId)
+                    .single(); // Ambil satu data saja
+
+                if (error) throw error;
+                
+                if (data) {
+                    // Update tampilan dengan data yang didapat
+                    displayUserData(data);
+                } else {
+                    // Jika data tidak ditemukan, paksa logout
+                    logout();
+                }
+
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                alert('Sesi Anda tidak valid. Silakan login kembali.');
+                logout();
+            }
+        }
+        
+        // 3. Tampilkan data ke halaman
+        function displayUserData(user) {
+            // Tampilkan saldo
+            saldoDisplay.textContent = `Rp ${user.saldo.toLocaleString('id-ID')}`;
+
+            // Jika rolenya 'admin', tampilkan menu admin
+            if (user.role === 'admin') {
+                adminMenu.style.display = 'block';
+            }
+        }
+
+        // --- FUNGSI INTERAKSI MENU ---
+        
+        // Buka/Tutup Sidebar
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // Buka/Tutup Submenu Produk
+        produkMenuItem.addEventListener('click', (event) => {
+            event.preventDefault(); // Mencegah link berpindah halaman
+            produkSubmenu.classList.toggle('open');
+        });
+
+        // Fungsi Logout
+        function logout() {
+            sessionStorage.removeItem('loggedInUserId');
+            window.location.href = 'index.html';
+        }
+        
+        // Anda bisa menambahkan link/tombol logout dan memanggil fungsi logout() ini
+    </script>
+</body>
+</html>
+          
