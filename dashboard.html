@@ -210,20 +210,14 @@
     </nav>
 
     <main class="main-content">
-        <h1>Selamat Datang di Dashboard Anda</h1>
-        <p>Silakan gunakan menu di samping kiri untuk navigasi.</p>
-    </main>
-
-    <footer class="footer">
-        © PAKET SIDOMPUL 2025
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // PERBAIKAN: Nama variabel diubah menjadi 'supabaseClient' untuk menghindari konflik
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- ELEMEN DOM ---
         const menuBtn = document.getElementById('menu-btn');
@@ -243,11 +237,9 @@
         async function checkLoginStatus() {
             const loggedInUserId = sessionStorage.getItem('loggedInUserId');
             if (!loggedInUserId) {
-                // Jika tidak ada, tendang kembali ke halaman login
                 alert('Anda harus login terlebih dahulu.');
                 window.location.href = 'index.html';
             } else {
-                // Jika ada, ambil data user tersebut
                 fetchUserData(loggedInUserId);
             }
         }
@@ -255,19 +247,18 @@
         // 2. Ambil data user dari Supabase
         async function fetchUserData(userId) {
             try {
-                const { data, error } = await supabase
+                // PERBAIKAN: Menggunakan 'supabaseClient' untuk melakukan query
+                const { data, error } = await supabaseClient
                     .from('agen')
                     .select('id_agen, saldo, role')
                     .eq('id_agen', userId)
-                    .single(); // Ambil satu data saja
+                    .single();
 
                 if (error) throw error;
                 
                 if (data) {
-                    // Update tampilan dengan data yang didapat
                     displayUserData(data);
                 } else {
-                    // Jika data tidak ditemukan, paksa logout
                     logout();
                 }
 
@@ -280,10 +271,8 @@
         
         // 3. Tampilkan data ke halaman
         function displayUserData(user) {
-            // Tampilkan saldo
             saldoDisplay.textContent = `Rp ${user.saldo.toLocaleString('id-ID')}`;
 
-            // Jika rolenya 'admin', tampilkan menu admin
             if (user.role === 'admin') {
                 adminMenu.style.display = 'block';
             }
@@ -304,7 +293,7 @@
 
         // Buka/Tutup Submenu Produk
         produkMenuItem.addEventListener('click', (event) => {
-            event.preventDefault(); // Mencegah link berpindah halaman
+            event.preventDefault();
             produkSubmenu.classList.toggle('open');
         });
 
@@ -313,9 +302,9 @@
             sessionStorage.removeItem('loggedInUserId');
             window.location.href = 'index.html';
         }
-        
-        // Anda bisa menambahkan link/tombol logout dan memanggil fungsi logout() ini
     </script>
+
+
 </body>
 </html>
           
