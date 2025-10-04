@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produk Akrab V2 - Paket Sidompul</title>
+    <style>
+        :root {
+            --primary-color: #3182ce;
+            --background-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-dark: #1a202c;
+            --text-light: #4a5568;
+            --success-color: #38a169;
+            --error-color: #e53e3e;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-dark);
+            font-size: 20px;
+        }
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        .product-meta .price {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        .product-stock {
+            font-weight: 600;
+        }
+        .stock-ready { color: var(--success-color); }
+        .stock-empty { color: var(--error-color); }
+
+        .product-description {
+            font-size: 14px;
+            color: var(--text-light);
+            white-space: pre-wrap; /* Agar format deskripsi rapi */
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .order-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .order-btn:hover { background-color: #2b6cb0; }
+        .order-btn:disabled { background-color: #a0aec0; cursor: not-allowed; }
+
+        /* --- Popup / Modal Styling --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-buttons button { flex: 1; }
+        #cancel-btn { background-color: #ccc; }
+
+        /* --- Struk / Receipt Styling --- */
+        .receipt-content {
+            border: 1px dashed var(--text-light);
+            padding: 20px;
+        }
+        .receipt-content h2 { color: var(--success-color); }
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .receipt-item span:first-child { font-weight: 600; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="dashboard.html">←</a>
+            <h1>Produk Akrab V2</h1>
+        </div>
+        <div id="product-grid" class="product-grid">
+            </div>
+    </div>
+
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modal-product-name"></h2>
+            <p>Masukkan nomor tujuan Anda:</p>
+            <input type="tel" id="nomor-tujuan" placeholder="Contoh: 081234567890">
+            <div class="modal-buttons">
+                <button id="cancel-btn" class="order-btn">Batal</button>
+                <button id="confirm-order-btn" class="order-btn">Kirim Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="receipt-modal" class="modal-overlay">
+        <div class="modal-content receipt-content">
+            <h2 style="color: var(--success-color);">Transaksi Berhasil!</h2>
+            <p>Terima kasih atas pesanan Anda.</p>
+            <div id="receipt-details"></div>
+            <br>
+            <button id="close-receipt-btn" class="order-btn">Tutup</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://bsexdtzpasauonjpbbrh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZXhkdHpwYXNhdW9uanBiYnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0Mjk2MzgsImV4cCI6MjA3NTAwNTYzOH0.E184tfMBjmue6RaVFoKJASH0HvewPEWN7DuxaDaqrzQ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- ELEMEN DOM ---
+        const productGrid = document.getElementById('product-grid');
+        const orderModal = document.getElementById('order-modal');
+        const receiptModal = document.getElementById('receipt-modal');
+        const loggedInUserId = localStorage.getItem('loggedInUserId');
+
+        // --- FUNGSI UTAMA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!loggedInUserId) {
+                alert('Anda harus login terlebih dahulu.');
+                window.location.href = 'index.html';
+                return;
+            }
+            fetchProducts();
+        });
+
+        // 1. Ambil dan tampilkan semua produk dari database
+        async function fetchProducts() {
+            try {
+                const { data, error } = await supabaseClient.from('products').select('*');
+                if (error) throw error;
+
+                productGrid.innerHTML = ''; // Kosongkan grid sebelum diisi
+                data.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <h3>${product.nama_produk}</h3>
+                        <div class="product-meta">
+                            <span>${product.kode_produk}</span>
+                            <span class="price">Rp ${product.harga_produk.toLocaleString('id-ID')}</span>
+                        </div>
+                        <p class="product-description">${product.deskripsi_produk}</p>
+                        <div class="product-meta">
+                            <span class="product-stock ${product.stok_produk > 0 ? 'stock-ready' : 'stock-empty'}">
+                                Stok: ${product.stok_produk}
+                            </span>
+                            <button class="order-btn" data-kode="${product.kode_produk}" ${product.stok_produk === 0 ? 'disabled' : ''}>
+                                ${product.stok_produk === 0 ? 'Stok Habis' : 'Order'}
+                            </button>
+                        </div>
+                    `;
+                    productGrid.appendChild(card);
+                });
+
+                // Tambahkan event listener ke setiap tombol order
+                document.querySelectorAll('.order-btn').forEach(button => {
+                    if (!button.disabled) {
+                        button.addEventListener('click', () => openOrderModal(button.dataset.kode));
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                productGrid.innerHTML = '<p>Gagal memuat produk. Coba lagi nanti.</p>';
+            }
+        }
+
+        // 2. Buka popup order saat tombol diklik
+        async function openOrderModal(kodeProduk) {
+            const { data: product, error } = await supabaseClient.from('products').select('*').eq('kode_produk', kodeProduk).single();
+            if (error || !product) {
+                alert('Gagal mendapatkan detail produk.');
+                return;
+            }
+
+            document.getElementById('modal-product-name').textContent = product.nama_produk;
+            document.getElementById('nomor-tujuan').value = '';
+            orderModal.style.display = 'flex';
+            
+            const confirmBtn = document.getElementById('confirm-order-btn');
+            const newConfirmBtn = confirmBtn.cloneNode(true); // Trik untuk hapus event listener lama
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+            newConfirmBtn.addEventListener('click', () => handleOrder(product));
+            document.getElementById('cancel-btn').addEventListener('click', () => orderModal.style.display = 'none');
+        }
+
+        // 3. Logika inti untuk memproses order
+        async function handleOrder(product) {
+            const nomorTujuan = document.getElementById('nomor-tujuan').value;
+            if (!nomorTujuan || !/^[0-9]{10,15}$/.test(nomorTujuan)) {
+                alert('Masukkan nomor tujuan yang valid (10-15 digit angka).');
+                return;
+            }
+
+            // Memulai proses transaksi
+            try {
+                // a. Cek saldo agen
+                const { data: agen, error: agenError } = await supabaseClient.from('agen').select('saldo').eq('id_agen', loggedInUserId).single();
+                if (agenError) throw new Error('Gagal memeriksa saldo Anda.');
+                if (agen.saldo < product.harga_produk) {
+                    alert('Saldo Anda tidak cukup untuk melakukan transaksi ini.');
+                    return;
+                }
+
+                // b. Kurangi saldo agen
+                const newSaldo = agen.saldo - product.harga_produk;
+                const { error: updateSaldoError } = await supabaseClient.from('agen').update({ saldo: newSaldo }).eq('id_agen', loggedInUserId);
+                if (updateSaldoError) throw new Error('Gagal mengupdate saldo.');
+
+                // c. Kurangi stok produk
+                const newStok = product.stok_produk - 1;
+                const { error: updateStokError } = await supabaseClient.from('products').update({ stok_produk: newStok }).eq('kode_produk', product.kode_produk);
+                if (updateStokError) throw new Error('Gagal mengupdate stok produk.');
+
+                // d. Catat ke history transaksi
+                const deskripsiTransaksi = `Pembelian ${product.nama_produk} ke ${nomorTujuan}`;
+                const { error: historyError } = await supabaseClient.from('transactions').insert({
+                    id_agen: loggedInUserId,
+                    tipe_transaksi: 'ORDER',
+                    kode_produk: product.kode_produk,
+                    deskripsi: deskripsiTransaksi,
+                    jumlah: product.harga_produk,
+                    status: 'BERHASIL'
+                });
+                if (historyError) throw new Error('Gagal mencatat transaksi.');
+
+                // e. Tampilkan struk jika semua berhasil
+                orderModal.style.display = 'none';
+                showReceipt(product, nomorTujuan, newSaldo);
+                fetchProducts(); // Refresh daftar produk untuk update stok
+
+            } catch (error) {
+                alert('Terjadi kesalahan saat memproses order: ' + error.message);
+                // Di aplikasi nyata, Anda perlu logika untuk mengembalikan transaksi (rollback) jika salah satu langkah gagal.
+            }
+        }
+        
+        // 4. Tampilkan struk transaksi
+        function showReceipt(product, nomorTujuan, sisaSaldo) {
+            const receiptDetails = document.getElementById('receipt-details');
+            const now = new Date();
+            receiptDetails.innerHTML = `
+                <div class="receipt-item"><span>Waktu</span> <span>${now.toLocaleString('id-ID')}</span></div>
+                <div class="receipt-item"><span>ID Agen</span> <span>${loggedInUserId}</span></div>
+                <div class="receipt-item"><span>Produk</span> <span>${product.nama_produk}</span></div>
+                <div class="receipt-item"><span>Nomor Tujuan</span> <span>${nomorTujuan}</span></div>
+                <div class="receipt-item"><span>Harga</span> <span>Rp ${product.harga_produk.toLocaleString('id-ID')}</span></div>
+                <div class="receipt-item" style="font-weight: 700;"><span>Sisa Saldo</span> <span>Rp ${sisaSaldo.toLocaleString('id-ID')}</span></div>
+            `;
+            receiptModal.style.display = 'flex';
+            document.getElementById('close-receipt-btn').addEventListener('click', () => receiptModal.style.display = 'none');
+        }
+    </script>
+</body>
+</html>
