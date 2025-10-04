@@ -157,10 +157,14 @@
                 if (error) {
                     throw error;
                 }
+if (data) {
+    // JIKA DATA DITEMUKAN (LOGIN BERHASIL)
+    alert('Login Berhasil!');
+    // BARIS BARU: Simpan ID agen yang login di session storage
+    sessionStorage.setItem('loggedInUserId', data.id_agen); 
+    window.location.href = 'dashboard.html'; // Lanjutkan ke halaman dashboard
+}
 
-                if (data) {
-                    alert('Login Berhasil!');
-                    window.location.href = 'dashboard.html';
                 } else {
                     errorMessage.textContent = 'DATA TIDAK DITEMUKAN, SILAHKAN HUBUNGI ADMIN UNTUK INFO LEBIH LANJUT.';
                     errorMessage.style.display = 'block';
